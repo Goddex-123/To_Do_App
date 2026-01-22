@@ -9,21 +9,21 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript)](https://typescriptlang.org/)
 [![Tailwind](https://img.shields.io/badge/Tailwind-4-38B2AC?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
 
-<img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcGd6cTdxdXRxbWRxbXd0OHJ4c2RzcjR6Y2t5Ym4wdDV0b3N6dWNueSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/JqmupuTVZYaQX5s094/giphy.gif" width="600" alt="JARVIS HUD" />
-
 ---
 
-### 🛡️ _"Just A Rather Very Intelligent System"_
-
-<br>
-
-## 🌐 [**👉 CLICK HERE FOR LIVE DEMO 👈**](https://goddex-123.github.io/To_Do_App/)
+### 🌐 [**👉 CLICK HERE FOR LIVE DEMO 👈**](https://goddex-123.github.io/To_Do_App/)
 
 <a href="https://goddex-123.github.io/To_Do_App/">
   <img src="https://img.shields.io/badge/LIVE%20DEMO-CLICK%20HERE-00FF88?style=for-the-badge&logo=github&logoColor=white" alt="Live Demo Badge" />
 </a>
 
 <br>
+<br>
+
+---
+
+### 🛡️ _"Just A Rather Very Intelligent System"_
+
 <br>
 
 </div>
