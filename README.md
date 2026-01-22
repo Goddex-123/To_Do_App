@@ -19,7 +19,12 @@
 
 ## 🌐 [**👉 CLICK HERE FOR LIVE DEMO 👈**](https://goddex-123.github.io/To_Do_App/)
 
-[![Live Demo](https://img.shields.io/badge/LIVE%20DEMO-Click%20Here-00FF88?style=for-the-badge&logo=github&logoColor=white)](https://goddex-123.github.io/To_Do_App/)
+<a href="https://goddex-123.github.io/To_Do_App/">
+  <img src="https://img.shields.io/badge/LIVE%20DEMO-CLICK%20HERE-00FF88?style=for-the-badge&logo=github&logoColor=white" alt="Live Demo Badge" />
+</a>
+
+<br>
+<br>
 
 </div>
 
@@ -29,7 +34,7 @@
 
 <table>
 <tr>
-<td width="50%">
+<td width="51%">
 
 ### 🎯 Core Functions
 
@@ -41,7 +46,7 @@
 - 💾 **LocalStorage** persistence
 
 </td>
-<td width="50%">
+<td width="51%">
 
 ### 🎨 JARVIS UI/UX
 
