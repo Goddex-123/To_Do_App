@@ -15,13 +15,13 @@
 
 ### 🛡️ _"Just A Rather Very Intelligent System"_
 
+<br>
+
+## 🌐 [**👉 CLICK HERE FOR LIVE DEMO 👈**](https://goddex-123.github.io/To_Do_App/)
+
+[![Live Demo](https://img.shields.io/badge/LIVE%20DEMO-Click%20Here-00FF88?style=for-the-badge&logo=github&logoColor=white)](https://goddex-123.github.io/To_Do_App/)
+
 </div>
-
----
-
-## 🌐 Live Demo
-
-> 🚧 **Coming Soon** - Deploy with Vercel for live demo
 
 ---
 
