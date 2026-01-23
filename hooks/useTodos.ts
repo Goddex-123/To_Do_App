@@ -11,29 +11,33 @@ export function useTodos() {
   const [filter, setFilter] = useState<FilterType>('all');
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load from localStorage
+  // Load from localStorage - set loaded immediately
   useEffect(() => {
+    // Set loaded first to prevent blocking
+    setIsLoaded(true);
+    
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        // Migrate old todos that don't have reminder fields
-        const parsed = JSON.parse(stored);
-        const migrated = parsed.map((t: Todo) => ({
-          ...t,
-          reminderTime: t.reminderTime ?? null,
-          reminderSent: t.reminderSent ?? false,
-        }));
-        setTodos(migrated);
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          // Migrate old todos
+          const migrated = parsed.map((t: Todo) => ({
+            ...t,
+            reminderTime: t.reminderTime ?? null,
+            reminderSent: t.reminderSent ?? false,
+          }));
+          setTodos(migrated);
+        }
       }
     } catch (e) {
       console.error('Failed to load todos:', e);
     }
-    setIsLoaded(true);
   }, []);
 
   // Save to localStorage
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded && typeof window !== 'undefined') {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
       } catch (e) {

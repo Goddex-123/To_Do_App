@@ -5,26 +5,30 @@ import { useState, useEffect, useCallback } from 'react';
 const STORAGE_KEY = 'premium-todo-theme';
 
 export function useTheme() {
-  const [isDark, setIsDark] = useState(true); // Default to dark for operator theme
+  const [isDark, setIsDark] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load theme from localStorage
+  // Load theme on mount - always set loaded immediately
   useEffect(() => {
+    // Set loaded first to prevent blocking
+    setIsLoaded(true);
+    
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const isLight = stored === '"light"' || stored === 'light';
-        setIsDark(!isLight);
-        if (isLight) {
-          document.documentElement.classList.add('light');
-        } else {
-          document.documentElement.classList.remove('light');
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const isLight = stored === '"light"' || stored === 'light';
+          setIsDark(!isLight);
+          if (isLight) {
+            document.documentElement.classList.add('light');
+          } else {
+            document.documentElement.classList.remove('light');
+          }
         }
       }
     } catch (e) {
       console.error('Failed to load theme:', e);
     }
-    setIsLoaded(true);
   }, []);
 
   const toggleTheme = useCallback(() => {
