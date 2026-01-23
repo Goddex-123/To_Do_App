@@ -1,11 +1,11 @@
 'use client';
 
 import { memo, useState, useRef, useEffect, useCallback } from 'react';
-import { Plus, Calendar, Flag, Command, Zap } from 'lucide-react';
+import { Plus, Calendar, Flag, Zap, Bell } from 'lucide-react';
 import { Priority } from '@/types';
 
 interface TodoInputProps {
-  onAdd: (text: string, priority: Priority, dueDate: string | null) => void;
+  onAdd: (text: string, priority: Priority, dueDate: string | null, reminderTime: string | null) => void;
 }
 
 const priorities: { key: Priority; label: string; color: string }[] = [
@@ -18,7 +18,9 @@ export const TodoInput = memo(function TodoInput({ onAdd }: TodoInputProps) {
   const [text, setText] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
   const [dueDate, setDueDate] = useState('');
+  const [reminderTime, setReminderTime] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const [showReminder, setShowReminder] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Global keyboard shortcut: Ctrl+K to focus
@@ -35,12 +37,14 @@ export const TodoInput = memo(function TodoInput({ onAdd }: TodoInputProps) {
 
   const handleSubmit = useCallback(() => {
     if (text.trim()) {
-      onAdd(text.trim(), priority, dueDate || null);
+      onAdd(text.trim(), priority, dueDate || null, reminderTime || null);
       setText('');
       setDueDate('');
+      setReminderTime('');
       setPriority('medium');
+      setShowReminder(false);
     }
-  }, [text, priority, dueDate, onAdd]);
+  }, [text, priority, dueDate, reminderTime, onAdd]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -116,6 +120,17 @@ export const TodoInput = memo(function TodoInput({ onAdd }: TodoInputProps) {
               </div>
             </div>
 
+            {/* Reminder toggle */}
+            <button
+              onClick={() => setShowReminder(!showReminder)}
+              className={`w-8 h-8 rounded flex items-center justify-center transition-colors ${
+                showReminder || reminderTime ? 'bg-[var(--accent-secondary)]/20 text-[var(--accent-secondary)]' : 'bg-[var(--foreground)]/5 text-[var(--foreground)]/50'
+              } hover:bg-[var(--foreground)]/10`}
+              title="Set reminder"
+            >
+              <Bell className="w-4 h-4" />
+            </button>
+
             {/* Submit */}
             <button
               onClick={handleSubmit}
@@ -127,6 +142,31 @@ export const TodoInput = memo(function TodoInput({ onAdd }: TodoInputProps) {
             </button>
           </div>
         </div>
+
+        {/* Reminder time picker (expandable) */}
+        {showReminder && (
+          <div className="px-4 pb-3 pt-1 border-t border-[var(--border)]">
+            <div className="flex items-center gap-3">
+              <Bell className="w-4 h-4 text-[var(--accent-secondary)]" />
+              <span className="text-xs text-[var(--foreground)]/60">Remind me at:</span>
+              <input
+                type="datetime-local"
+                value={reminderTime}
+                onChange={(e) => setReminderTime(e.target.value)}
+                min={new Date().toISOString().slice(0, 16)}
+                className="flex-1 bg-[var(--foreground)]/5 border border-[var(--border)] rounded px-3 py-1.5 text-xs"
+              />
+              {reminderTime && (
+                <button
+                  onClick={() => setReminderTime('')}
+                  className="text-xs text-[var(--accent-danger)] hover:underline"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Keyboard hint */}
         <div className="px-4 pb-2 flex items-center gap-4 text-[10px] text-[var(--foreground)]/30">

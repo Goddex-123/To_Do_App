@@ -8,6 +8,8 @@ export interface Todo {
   completed: boolean;
   priority: Priority;
   dueDate: string | null;
+  reminderTime: string | null; // ISO datetime string for when to remind
+  reminderSent: boolean; // Track if reminder was already sent
   createdAt: string;
 }
 

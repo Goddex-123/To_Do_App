@@ -1,11 +1,11 @@
 'use client';
 
 import { memo, useState, useRef, useCallback } from 'react';
-import { Check, Trash2, GripVertical, Calendar, Pencil, X, ChevronRight } from 'lucide-react';
+import { Check, Trash2, GripVertical, Calendar, Pencil, X, ChevronRight, Bell, BellOff } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Todo } from '@/types';
-import { formatDate, isOverdue } from '@/lib/utils';
+import { formatDate, isOverdue, formatReminderTime } from '@/lib/utils';
 
 interface TodoCardProps {
   todo: Todo;
@@ -17,6 +17,8 @@ interface TodoCardProps {
 export const TodoCard = memo(function TodoCard({ todo, onToggle, onDelete, onEdit }: TodoCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
+  const [showReminderEdit, setShowReminderEdit] = useState(false);
+  const [editReminder, setEditReminder] = useState(todo.reminderTime || '');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -56,7 +58,22 @@ export const TodoCard = memo(function TodoCard({ todo, onToggle, onDelete, onEdi
     setTimeout(() => inputRef.current?.focus(), 0);
   }, []);
 
+  const handleReminderSave = useCallback(() => {
+    onEdit(todo.id, { 
+      reminderTime: editReminder || null,
+      reminderSent: false // Reset reminder sent status when updating
+    });
+    setShowReminderEdit(false);
+  }, [editReminder, todo.id, onEdit]);
+
+  const clearReminder = useCallback(() => {
+    onEdit(todo.id, { reminderTime: null, reminderSent: false });
+    setEditReminder('');
+    setShowReminderEdit(false);
+  }, [todo.id, onEdit]);
+
   const overdue = isOverdue(todo.dueDate) && !todo.completed;
+  const hasActiveReminder = todo.reminderTime && !todo.reminderSent && !todo.completed;
   
   const priorityStyles = {
     high: 'badge-high',
@@ -143,10 +160,33 @@ export const TodoCard = memo(function TodoCard({ todo, onToggle, onDelete, onEdi
               {formatDate(todo.dueDate)}
             </div>
           )}
+
+          {/* Reminder indicator */}
+          {hasActiveReminder && (
+            <div className="flex items-center gap-1 text-xs font-mono text-[var(--accent-secondary)]">
+              <Bell className="w-3 h-3 animate-pulse" />
+              {formatReminderTime(todo.reminderTime!)}
+            </div>
+          )}
         </div>
 
         {/* Actions */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {/* Reminder button */}
+          <button
+            onClick={() => {
+              setEditReminder(todo.reminderTime || '');
+              setShowReminderEdit(!showReminderEdit);
+            }}
+            className={`p-1.5 rounded transition-colors ${
+              hasActiveReminder 
+                ? 'text-[var(--accent-secondary)] hover:bg-[var(--accent-secondary)]/10' 
+                : 'text-[var(--foreground)]/50 hover:text-[var(--accent-secondary)] hover:bg-[var(--accent-secondary)]/10'
+            }`}
+            title={hasActiveReminder ? 'Edit reminder' : 'Set reminder'}
+          >
+            {hasActiveReminder ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
+          </button>
           <button
             onClick={startEdit}
             className="p-1.5 text-[var(--foreground)]/50 hover:text-[var(--accent)] hover:bg-[var(--accent)]/10 rounded transition-colors"
@@ -161,6 +201,35 @@ export const TodoCard = memo(function TodoCard({ todo, onToggle, onDelete, onEdi
           </button>
         </div>
       </div>
+
+      {/* Reminder edit section */}
+      {showReminderEdit && (
+        <div className="px-4 pb-3 pt-1 border-t border-[var(--border)] flex items-center gap-3">
+          <Bell className="w-4 h-4 text-[var(--accent-secondary)]" />
+          <span className="text-xs text-[var(--foreground)]/60">Remind at:</span>
+          <input
+            type="datetime-local"
+            value={editReminder}
+            onChange={(e) => setEditReminder(e.target.value)}
+            min={new Date().toISOString().slice(0, 16)}
+            className="flex-1 bg-[var(--foreground)]/5 border border-[var(--border)] rounded px-3 py-1.5 text-xs"
+          />
+          <button
+            onClick={handleReminderSave}
+            className="px-3 py-1 bg-[var(--accent-secondary)] text-black text-xs font-semibold rounded"
+          >
+            Save
+          </button>
+          {todo.reminderTime && (
+            <button
+              onClick={clearReminder}
+              className="text-xs text-[var(--accent-danger)] hover:underline"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 });

@@ -33,6 +33,23 @@ export function isOverdue(dateString: string | null): boolean {
   return date < today;
 }
 
+export function formatReminderTime(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = date.getTime() - now.getTime();
+  const diffMins = Math.round(diffMs / 60000);
+  
+  if (diffMins < 0) return 'PAST';
+  if (diffMins < 1) return 'NOW';
+  if (diffMins < 60) return `${diffMins}m`;
+  
+  const diffHours = Math.round(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h`;
+  
+  const diffDays = Math.round(diffHours / 24);
+  return `${diffDays}d`;
+}
+
 export function calculateStats(todos: Todo[]) {
   const total = todos.length;
   const completed = todos.filter((t) => t.completed).length;

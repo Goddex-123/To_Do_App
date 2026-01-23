@@ -16,7 +16,14 @@ export function useTodos() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        setTodos(JSON.parse(stored));
+        // Migrate old todos that don't have reminder fields
+        const parsed = JSON.parse(stored);
+        const migrated = parsed.map((t: Todo) => ({
+          ...t,
+          reminderTime: t.reminderTime ?? null,
+          reminderSent: t.reminderSent ?? false,
+        }));
+        setTodos(migrated);
       }
     } catch (e) {
       console.error('Failed to load todos:', e);
@@ -47,13 +54,15 @@ export function useTodos() {
     }
   }, [todos, filter]);
 
-  const addTodo = useCallback((text: string, priority: Priority, dueDate: string | null) => {
+  const addTodo = useCallback((text: string, priority: Priority, dueDate: string | null, reminderTime: string | null = null) => {
     const newTodo: Todo = {
       id: generateId(),
       text,
       completed: false,
       priority,
       dueDate,
+      reminderTime,
+      reminderSent: false,
       createdAt: new Date().toISOString(),
     };
     setTodos((prev) => [newTodo, ...prev]);
@@ -74,6 +83,12 @@ export function useTodos() {
   const editTodo = useCallback((id: string, updates: Partial<Omit<Todo, 'id' | 'createdAt'>>) => {
     setTodos((prev) =>
       prev.map((t) => (t.id === id ? { ...t, ...updates } : t))
+    );
+  }, []);
+
+  const markReminderSent = useCallback((id: string) => {
+    setTodos((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, reminderSent: true } : t))
     );
   }, []);
 
@@ -99,6 +114,7 @@ export function useTodos() {
     deleteTodo,
     toggleTodo,
     editTodo,
+    markReminderSent,
     reorderTodos,
     clearCompleted,
     completeAll,

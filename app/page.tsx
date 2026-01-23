@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { Terminal, Shield, Wifi } from 'lucide-react';
+import { Terminal, Shield, Wifi, Bell } from 'lucide-react';
 import {
   OperatorBackground,
   ThemeToggle,
@@ -16,6 +16,7 @@ import { QuickActions } from '@/components/QuickActions';
 import { useTodos } from '@/hooks/useTodos';
 import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/useToast';
+import { useNotifications } from '@/hooks/useNotifications';
 import { Priority } from '@/types';
 
 export default function Home() {
@@ -28,6 +29,7 @@ export default function Home() {
     deleteTodo,
     toggleTodo,
     editTodo,
+    markReminderSent,
     reorderTodos,
     clearCompleted,
     completeAll,
@@ -37,6 +39,15 @@ export default function Home() {
   const { isDark, toggleTheme, isLoaded: themeLoaded } = useTheme();
   const { toasts, showToast, removeToast } = useToast();
   const [currentTime, setCurrentTime] = useState<string>('');
+
+  // Notifications hook
+  useNotifications(todos, (id) => {
+    markReminderSent(id);
+    const todo = todos.find(t => t.id === id);
+    if (todo) {
+      showToast(`⏰ Reminder: ${todo.text}`, 'info');
+    }
+  });
 
   // Update time every second
   useEffect(() => {
@@ -60,9 +71,18 @@ export default function Home() {
     completed: todos.filter(t => t.completed).length,
   }), [todos]);
 
-  const handleAddTodo = useCallback((text: string, priority: Priority, dueDate: string | null) => {
-    addTodo(text, priority, dueDate);
-    showToast('Mission objective added', 'success');
+  // Count active reminders
+  const activeReminders = useMemo(() => 
+    todos.filter(t => t.reminderTime && !t.reminderSent && !t.completed).length,
+  [todos]);
+
+  const handleAddTodo = useCallback((text: string, priority: Priority, dueDate: string | null, reminderTime: string | null) => {
+    addTodo(text, priority, dueDate, reminderTime);
+    if (reminderTime) {
+      showToast('Mission objective added with reminder ⏰', 'success');
+    } else {
+      showToast('Mission objective added', 'success');
+    }
   }, [addTodo, showToast]);
 
   const handleDeleteTodo = useCallback((id: string) => {
@@ -138,6 +158,12 @@ export default function Home() {
                   <Shield className="w-3 h-3 text-[var(--accent)]" />
                   <span className="text-[var(--foreground)]/50">SECURE</span>
                 </div>
+                {activeReminders > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <Bell className="w-3 h-3 text-[var(--accent-secondary)] animate-pulse" />
+                    <span className="text-[var(--accent-secondary)]">{activeReminders} ALERT{activeReminders > 1 ? 'S' : ''}</span>
+                  </div>
+                )}
                 <div className="px-2 py-1 rounded bg-[var(--foreground)]/5 text-[var(--accent)]">
                   {currentTime}
                 </div>
@@ -186,6 +212,12 @@ export default function Home() {
               <span>System v1.0</span>
               <span>•</span>
               <span>{todos.length} objectives loaded</span>
+              {activeReminders > 0 && (
+                <>
+                  <span>•</span>
+                  <span className="text-[var(--accent-secondary)]">{activeReminders} reminders active</span>
+                </>
+              )}
             </div>
           </footer>
         </div>
