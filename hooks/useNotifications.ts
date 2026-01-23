@@ -11,10 +11,17 @@ export function useNotifications(
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const processedRef = useRef<Set<string>>(new Set());
 
-  // Check permission on mount (non-blocking)
+  // Request notification permission on mount
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
-      setPermission(Notification.permission);
+      if (Notification.permission === 'default') {
+        // Auto-request permission when page loads
+        Notification.requestPermission().then((perm) => {
+          setPermission(perm);
+        });
+      } else {
+        setPermission(Notification.permission);
+      }
     }
   }, []);
 
